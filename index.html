@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>A Simple Pre-loader Concept</title>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script>
+        /**
+         * By Jeremy Heminger : 2016
+         *
+         * This would normally be used in conjunction with a script (an event handler) that checks if all the pages (or scripts)
+         * media has been loaded...These could be images, video, or 3d assets
+         * 
+         * but for this demonstration I am simply using a loop.
+         *
+         * To create different length linear spins use the file spin.php
+         * 
+         * */
+        $(document).ready(function(){
+            // fake loader loop
+            // I will add the imageloaded plugin when live
+            var it = 0;
+            
+            var max = 100;
+            
+            var bool = true;
+            
+            // lets save some file size (in case we want to minify this)
+            // a string won't be minified, but if we set it as a variable it effectivly will as it will be assigned
+            // t = target
+            var t = '.loader .spinner div:nth-child';
+                    
+            // 061375 in order (my URL 061375.com)
+            var e = {
+                    1:0,
+                    2:6,
+                    3:1,
+                    4:3,
+                    5:7,
+                    6:5
+                }
+            // set id to our loop
+            var id = setInterval(function() {
+                // if we are rolling
+                if (bool) {
+                    // set a random value from 1-6
+                    var a = Math.floor((Math.random() * 60) / 6);
+                    // set b to a
+                    var b = a;
+                    // set another random number 1-6 (that is not a)
+                    while(b == a) {
+                        b = Math.floor((Math.random() * 60) / 6);
+                    }
+
+                    $(t+'('+a+')').fadeTo('fast',0,function(){
+                        $(t+'('+b+')').fadeTo('fast',0,function(){
+                            var aa = $(t+'('+a+')').html();
+                            var bb = $(t+'('+b+')').html();
+                            $(t+'('+a+')').html(bb);
+                            $(t+'('+b+')').html(aa);
+                            $(t+'('+b+')').fadeTo('fast',1,function(){
+                                $(t+'('+a+')').fadeTo('fast',1);
+                            });
+                        });
+                    });
+                    // loop counter
+                    it++;
+                    // if 
+                    if (it == max ) {
+                        // hard kill the loop because the interval will loop again
+                        bool = false;
+                        clearInterval(id);
+                        // save some file size
+                        var td = '.loader .spinner div';
+                        // fade out the numbers
+                        $(td).fadeTo('fast',0,function(){
+                            // assign all the number to their default values
+                            $.each(e,function(k,v){
+                                // set the object key as an integer and increment
+                                // DEPRECATED - just assign the object key as 1-6
+                                //var kk = parseInt(k) + 1;
+                                $(t+'('+k+')').html(v);
+                                // fade out our target
+                                $(td).fadeTo('fast',1,function(){
+                                    // add the spinup animation
+                                    $('.loader').addClass('spinup');
+                                    // hide the title
+                                    $('.loader h3,.loader h4').css('display','none');
+                                    // give it 2 seconds then spin the numbers off into space
+                                    // presumably due to centripetal force
+                                    setTimeout(function(){
+                                        $(td).addClass('fly');
+                                        // fade everything out
+                                        $('.loader').fadeOut("slow");
+                                    },2000);
+                                });
+                            });
+                        });
+                    }
+                }
+            },100);
+        });
+    </script>
+    <style>
+        body {
+            background: #ececec;
+        }
+        @font-face {
+            font-family: jersey;
+            src: url(font/jersey.ttf);
+        }
+        /*
+         * This should be done using SASS or LESS with prefixes
+         * But this is just a proof of concept
+         * */
+        .loader {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            top: 45vh;
+            left: 45vw;
+            z-index:9999;
+            font-family: jersey;
+            color: #fff;
+        }
+        .loader h3 {
+            position: absolute;
+            left: -65px;
+            bottom: -60px;
+            width: 500px;
+            color: #1e1e1e;
+        }
+        .loader h4 {
+            position: absolute;
+            left: -25px;
+            bottom: -90px;
+            width: 500px;
+            color: #1e1e1e;
+        }
+        .loader div:first-child {
+            position: relative;
+        }
+        .loader .circle {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: #414042;
+            border-radius: 50%;
+        }
+        .loader .spinner {
+            width: 70px;
+            height: 100px;
+            position: absolute;
+            left: 10px;
+            top: 0;
+            font-size: 30px;
+            margin: 13px 8px;
+            text-align: center;
+        }
+        .loader .spinner div {
+            float: left;
+            padding: 1px 3px;
+            width: 15px;
+            text-shadow: 0px 0px 10px #fff;
+            transition: 0.5s ease-out;
+            opacity: 1;
+        }
+        .loader .spinner div:nth-child(1).fly {
+            transform: translate(-100px,-100px);
+            opacity: 0;
+        }
+        .loader .spinner div:nth-child(2).fly {
+            transform: translate(0px,-100px);
+            opacity: 0;
+        }
+        .loader .spinner div:nth-child(3).fly {
+            transform: translate(100px,-100px);
+            opacity: 0;
+        }
+        .loader .spinner div:nth-child(4).fly {
+            transform: translate(-100px,100px);
+            opacity: 0;
+        }
+        .loader .spinner div:nth-child(5).fly {
+            transform: translate(0px,100px);
+            opacity: 0;
+        }
+        .loader .spinner div:nth-child(6).fly {
+            transform: translate(100px,100px);
+            opacity: 0;
+        }
+        .loader.spinup {
+            animation: spinup 3s forwards linear;
+        }
+        @keyframes spinup {
+            0%{transform:rotate(0deg)}
+            5%{transform:rotate(1deg)}
+            10%{transform:rotate(16deg)}
+            15%{transform:rotate(81deg)}
+            20%{transform:rotate(256deg)}
+            25%{transform:rotate(625deg)}
+            30%{transform:rotate(1296deg)}
+            35%{transform:rotate(2401deg)}
+            40%{transform:rotate(4096deg)}
+            45%{transform:rotate(6561deg)}
+            50%{transform:rotate(10000deg)}
+            55%{transform:rotate(14641deg)}
+            60%{transform:rotate(20736deg)}
+            65%{transform:rotate(28561deg)}
+            70%{transform:rotate(38416deg)}
+            75%{transform:rotate(50625deg)}
+            80%{transform:rotate(65536deg)}
+            85%{transform:rotate(83521deg)}
+            90%{transform:rotate(104976deg)}
+            95%{transform:rotate(130321deg)}
+            100%{transform:rotate(160000deg)}
+        }
+    </style>
+</head>
+
+<body>
+<div class="loader">
+    <div>
+        <div class="circle">
+        </div>
+        <div class="spinner">
+            <div>0</div>
+            <div>6</div>
+            <div>1</div>
+            <div>3</div>
+            <div>7</div>
+            <div>5</div>
+        </div>
+        <h3>A SIMPLE PRE-LOADER ANIMATION</h3>
+        <h4>LOADING PLEASE WAIT...</h4>
+    </div>
+</div>
+</body>
+</html>
